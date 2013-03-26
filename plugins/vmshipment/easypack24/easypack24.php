@@ -161,8 +161,23 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
         $parcelApi = easypack24_helper::connectEasypack24($params);
 
         if(@$parcelApi['info']['redirect_url'] != ''){
-            $tmp = explode('/', @$parcelApi['info']['redirect_url']);
-            $parcel_id = $tmp[count($tmp)-1];
+
+            // get machines
+            $parcelApi = easypack24_helper::connectEasypack24(
+                array(
+                    'url' => $parcelApi['info']['redirect_url'],
+                    'token' => $method->API_KEY,
+                    'ds' => '&',
+                    'methodType' => 'GET',
+                    'params' => array(
+                    )
+                )
+            );
+            if(!isset($parcelApi['result']->id)){
+                return false;
+            }
+
+            $parcel_id = $parcelApi['result']->id;
 
             $values['virtuemart_order_id'] = $order_id;
             $values['parcel_id'] = $parcel_id;

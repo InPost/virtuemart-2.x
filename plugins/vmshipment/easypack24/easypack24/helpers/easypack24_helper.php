@@ -26,6 +26,7 @@ class easypack24_helper {
             array(
                 'url' => $params['url'],
                 'token' => $params['token'],
+                'ds' => '?',
                 'methodType' => $params['methodType'],
                 'params' => $params['params']
             ),
@@ -42,9 +43,9 @@ class easypack24_helper {
                     foreach($params['params'] as $field_name => $field_value){
                         $getParams .= $field_name.'='.urlencode($field_value).'&';
                     }
-                    curl_setopt($ch, CURLOPT_URL, $params['url'].'?token='.$params['token'].'&'.$getParams);
+                    curl_setopt($ch, CURLOPT_URL, $params['url'].$params['ds'].'token='.$params['token'].'&'.$getParams);
                 }else{
-                    curl_setopt($ch, CURLOPT_URL, $params['url'].'?token='.$params['token']);
+                    curl_setopt($ch, CURLOPT_URL, $params['url'].$params['ds'].'token='.$params['token']);
                 }
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
                 break;
@@ -53,7 +54,7 @@ class easypack24_helper {
                 $string = json_encode($params['params']);
                 #$string = $params['params'];
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-HTTP-Method-Override: POST') );
-                curl_setopt($ch, CURLOPT_URL, $params['url'].'?token='.$params['token']);
+                curl_setopt($ch, CURLOPT_URL, $params['url'].$params['ds'].'token='.$params['token']);
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
@@ -67,7 +68,7 @@ class easypack24_helper {
                 $string = json_encode($params['params']);
                 #$string = $params['params'];
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-HTTP-Method-Override: PUT') );
-                curl_setopt($ch, CURLOPT_URL, $params['url'].'?token='.$params['token']);
+                curl_setopt($ch, CURLOPT_URL, $params['url'].$params['ds'].'token='.$params['token']);
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
@@ -207,13 +208,13 @@ class easypack24_helper {
 
     public static function setLang(){
         $jlang = JFactory::getLanguage();
-        //$jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', 'en-GB', true);
-        //$jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', $jlang->getDefault(), true);
-        //$jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', null, true);
+        $jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', 'en-GB', true);
+        $jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', $jlang->getDefault(), true);
+        $jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', null, true);
 
-        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, 'en-GB', true);
-        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, $jlang->getDefault(), true);
-        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, null, true);
+//        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, 'en-GB', true);
+//        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, $jlang->getDefault(), true);
+//        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, null, true);
 
 
     }
