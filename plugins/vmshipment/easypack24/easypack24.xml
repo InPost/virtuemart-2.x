@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<install version="1.5" type="plugin" group="vmshipment" >
+    <name>VMSHIPMENT_EASYPACK24</name>
+    <creationDate>March 18 2013</creationDate>
+    <author>InPost</author>
+    <authorUrl>http://www.inpost.pl</authorUrl>
+    <copyright>Copyright (C) 2004-2012 Virtuemart Team. All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+    <version>2.0.20b</version>
+    <description>InPost Parcel Lockers 24/7</description>
+
+    <files>
+        <filename plugin="easypack24">easypack24.php</filename>
+        <folder>easypack24</folder>
+        <folder>language</folder>
+    </files>
+
+    <languages folder="language">
+        <language tag="en-GB">en-GB/en-GB.com_virtuemart_easypack24.ini</language>
+        <language tag="en-GB">en-GB/en-GB.com_virtuemart_easypack24.sys.ini</language>
+    </languages>
+
+    <params addpath="/plugins/vmshipment/easypack24/elements" />
+    <params addpath="/plugins/vmshipment/easypack24/easypack24/elements" />
+    <params addpath="/administrator/components/com_virtuemart/elements">
+        <param type="vmjpluginwarning" />
+        <param type="spacer" default="" level="level1" />
+         <param	name="shipment_logos" type="vmfiles" label="VMSHIPMENT_EASYPACK24_LOGOS"
+                    description="InPost Parcel Lockers 24/7"
+                    directory="/images/stories/virtuemart/shipment"
+                    default="default" hide_default="1" hide_none="1"
+                    stripext="0"   exclude="^_" />
+        <param name="API_URL" type="text" size="100" default="" label="" description="Api url"/>
+        <param name="API_KEY" type="text" size="100" default="" label="" description="Api key"/>
+        <param name="PRICE" type="text" size="5" default="" label="" description="Price"/>
+        <param name="tax_id" type="vmtaxes" scope="com_virtuemart"  label="VMSHIPMENT_EASYPACK24_TAX" description="VMSHIPMENT_EASYPACK24_TAX_DESC" />
+        <param name="WEIGHT_UNIT" type="vmweightunit" size="10" default="" label="" description="Weight unit"/>
+        <param name="MAX_WEIGHT" type="text" size="5" default="" label="" description="Max weight"/>
+        <param name="MAX_DIMENSION_A" type="text" size="10" default="" label="" description="Max dimension A"/>
+        <param name="MAX_DIMENSION_B" type="text" size="10" default="" label="" description="Max dimension B"/>
+        <param name="MAX_DIMENSION_C" type="text" size="10" default="" label="" description="Max dimension C"/>
+        <param name="ALLOWED_COUNTRY" type="vmcountries"  scope="com_virtuemart" default="" label="" description="Allowed country"/>
+    </params>
+</install>
