@@ -25,7 +25,7 @@
             <a href="#" onclick="openMap(); return false;"><?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_VIEW_MAP'); ?></a>&nbsp|&nbsp<input type="checkbox" name="show_all_machines"><?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_SHOW_TERMINALS'); ?>
             <br>
             <br>&nbsp; &nbsp; &nbsp; &nbsp;<b><?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_VIEW_MOB_EXAMPLE'); ?> </b>
-            <br>&nbsp; &nbsp; &nbsp; &nbsp;<?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_MOB_PREFIX'); ?><input type='text' name='shipping_easypack24[receiver_phone]' id="easypack24_phone" title="<?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_VIEW_MOB_TITLE'); ?>" value='<?php echo @$_POST['shipping_easypack24']['receiver_phone']?@$_POST['shipping_easypack24']['receiver_phone']:$viewData['easypack24']['address']['phone_2']; ?>' />
+            <br>&nbsp; &nbsp; &nbsp; &nbsp;<?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_MOB_PREFIX'); ?><input type='text' name='shipping_easypack24[receiver_phone]' id="easypack24_phone" title="<?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_VIEW_MOB_TITLE'); ?>" value='<?php echo @$_POST['shipping_easypack24']['receiver_phone']?@$_POST['shipping_easypack24']['receiver_phone']:$viewData['easypack24']['user_phone']; ?>' />
 
             <script type="text/javascript">
                 function user_function(value) {

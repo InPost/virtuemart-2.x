@@ -118,7 +118,6 @@ class VirtuemartControllerEasypack extends VmController {
                     )
                 ));
 
-
                 if(@$parcelApiPay['info']['http_code'] != '204'){
                     $countNonSticker = count($parcelsIds);
                     if(!empty($parcelApiPay['result'])){
