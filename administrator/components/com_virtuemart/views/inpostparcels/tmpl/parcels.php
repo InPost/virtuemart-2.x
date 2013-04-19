@@ -29,7 +29,7 @@ AdminUIHelper::startAdminArea ();
                 <tr>
                     <td align="left" width="100%">
                         <?php echo $this->displayDefaultViewSearch ('name'); ?>
-                        <?php echo JText::_ ('COM_VIRTUEMART_EASYPACK24_VIEW_PARCEL_STATUS') . ':' . $this->lists['state_list']; ?>
+                        <?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_PARCEL_STATUS') . ':' . $this->lists['state_list']; ?>
                     </td>
                 </tr>
             </table>
@@ -41,12 +41,13 @@ AdminUIHelper::startAdminArea ();
         <tr>
             <th><input type="checkbox" name="toggle" value="" onclick="checkAll('<?php echo count ($this->parcelslist); ?>')"/></th>
             <th><?php echo $this->sort ('id', 'ID')  ?></th>
-            <th><?php echo $this->sort ('virtuemart_order_id', 'COM_VIRTUEMART_EASYPACK24_VIEW_ORDER_ID')  ?></th>
-            <th><?php echo $this->sort ('parcel_id', 'COM_VIRTUEMART_EASYPACK24_VIEW_PARCEL_ID')  ?></th>
-            <th><?php echo $this->sort ('parcel_status', 'COM_VIRTUEMART_EASYPACK24_VIEW_STATUS')  ?></th>
-            <th><?php echo $this->sort ('parcel_target_machine_id', 'COM_VIRTUEMART_EASYPACK24_VIEW_MACHINE_ID')  ?></th>
-            <th><?php echo $this->sort ('sticker_creation_date', 'COM_VIRTUEMART_EASYPACK24_VIEW_STICKER_CREATION_DATE')  ?></th>
-            <th><?php echo $this->sort ('created_on', 'COM_VIRTUEMART_EASYPACK24_VIEW_CREATION_DATE')  ?></th>
+            <th><?php echo $this->sort ('virtuemart_order_id', 'COM_VIRTUEMART_INPOSTPARCELS_VIEW_ORDER_ID')  ?></th>
+            <th><?php echo $this->sort ('parcel_id', 'COM_VIRTUEMART_INPOSTPARCELS_VIEW_PARCEL_ID')  ?></th>
+            <th><?php echo $this->sort ('parcel_status', 'COM_VIRTUEMART_INPOSTPARCELS_VIEW_STATUS')  ?></th>
+            <th><?php echo $this->sort ('parcel_target_machine_id', 'COM_VIRTUEMART_INPOSTPARCELS_VIEW_MACHINE_ID')  ?></th>
+            <th><?php echo $this->sort ('sticker_creation_date', 'COM_VIRTUEMART_INPOSTPARCELS_VIEW_STICKER_CREATION_DATE')  ?></th>
+            <th><?php echo $this->sort ('created_on', 'COM_VIRTUEMART_INPOSTPARCELS_VIEW_CREATION_DATE')  ?></th>
+            <th><?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_ACTIONS')  ?></th>
         </tr>
         </thead>
         <tbody>
@@ -67,16 +68,27 @@ AdminUIHelper::startAdminArea ();
                 <?php
                 $link_order = 'index.php?option=com_virtuemart&view=orders&task=edit&virtuemart_order_id=' . $parcel->virtuemart_order_id;
                 ?>
-                <td><?php echo JHTML::_ ('link', JRoute::_ ($link_order), $parcel->order_number, array('title' => JText::_ ('COM_VIRTUEMART_EASYPACK24_VIEW_EDIT_ORDER') . ' ' . $parcel->order_number)); ?></td>
+                <td><?php echo JHTML::_ ('link', JRoute::_ ($link_order), $parcel->order_number, array('title' => JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_EDIT_ORDER') . ' ' . $parcel->order_number)); ?></td>
                 <!-- Parcel id -->
                 <?php
-                $link_parcel = 'index.php?option=com_virtuemart&view=easypack&task=edit&id=' . $parcel->id;
+                $link_parcel = 'index.php?option=com_virtuemart&view=inpostparcels&task=edit&id=' . $parcel->id;
                 ?>
-                <td><?php echo JHTML::_ ('link', JRoute::_ ($link_parcel), $parcel->parcel_id, array('title' => JText::_ ('COM_VIRTUEMART_EASYPACK24_VIEW_EDIT_PARCEL') . ' ' . $parcel->parcel_id)); ?></td>
+                <td><?php echo JHTML::_ ('link', JRoute::_ ($link_parcel), $parcel->parcel_id, array('title' => JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_EDIT_PARCEL') . ' ' . $parcel->parcel_id)); ?></td>
                 <td><?php echo $parcel->parcel_status; ?>
                 <td><?php echo $parcel->parcel_target_machine_id; ?>
                 <td><?php echo $parcel->sticker_creation_date; ?>
                 <td><?php echo $parcel->created_on; ?>
+                <!-- Actions -->
+                <?php
+                if($parcel->parcel_id == '0'){
+                    $link_name = JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_CREATE_PARCEL');
+                }else{
+                    $link_name = JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_EDIT_PARCEL');
+                }
+                $link_edit = 'index.php?option=com_virtuemart&view=inpostparcels&task=edit&id=' . $parcel->id;
+                $cell = JHTML::_ ('link', JRoute::_ ($link_edit), $link_name, array('title' => JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_EDIT_PARCEL') . ' ' . $parcel->id));
+                ?>
+                <td><?php echo $cell; ?></td>
             </tr>
                 <?php
                 $k = 1 - $k;

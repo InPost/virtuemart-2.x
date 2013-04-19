@@ -29,7 +29,7 @@ if(!class_exists('VmTable'))require(JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'vmta
  * @author RolandD
  * @author Max Milbers
  */
-class TableEasypack24 extends VmTable {
+class TableInpostparcels extends VmTable {
 
 	/** @var int Primary key */
 	var $id = 0;
@@ -60,7 +60,7 @@ class TableEasypack24 extends VmTable {
 	 *
 	 */
 	function __construct($db) {
-		parent::__construct('#__virtuemart_shipment_plg_easypack24', 'id', $db);
+		parent::__construct('#__virtuemart_shipment_plg_inpostparcels', 'id', $db);
 
 		$this->setUniqueName('order_number');
 		$this->setLoggable();

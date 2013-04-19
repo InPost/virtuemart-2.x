@@ -25,16 +25,16 @@ jimport('joomla.application.component.controller');
 if(!class_exists('VmController'))require(JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'vmcontroller.php');
 
 if (JVM_VERSION === 2) {
-    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'easypack24' . DS . 'easypack24' . DS . 'helpers' . DS . 'define.php');
+    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'inpostparcels' . DS . 'inpostparcels' . DS . 'helpers' . DS . 'define.php');
 } else {
-    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'easypack24' . DS . 'helpers' . DS . 'define.php');
+    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'inpostparcels' . DS . 'helpers' . DS . 'define.php');
 }
 
 if (!class_exists ('vmPlugin')) {
     require(JPATH_VM_PLUGINS . DS . 'vmplugin.php');
 }
 
-require_once (JPATH_VMEASYPACK24PLUGIN . DS . 'easypack24' . DS . 'helpers' . DS . 'easypack24_helper.php');
+require_once (JPATH_VMINPOSTPARCELSPLUGIN . DS . 'inpostparcels' . DS . 'helpers' . DS . 'inpostparcels_helper.php');
 require(JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'parameterparser.php');
 
 /**
@@ -43,7 +43,7 @@ require(JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'parameterparser.php');
  * @package    VirtueMart
  * @author
  */
-class VirtuemartControllerEasypack extends VmController {
+class VirtuemartControllerInpostparcels extends VmController {
 
 	/**
 	 * Method to display the view
@@ -57,10 +57,10 @@ class VirtuemartControllerEasypack extends VmController {
 	function __construct() {
 		parent::__construct();
 
-        //$parameters = new vmParameters('TableShipmentmethods', 'easypack24', 'plugin', 'vmshipment');
+        //$parameters = new vmParameters('TableShipmentmethods', 'inpostparcels', 'plugin', 'vmshipment');
         //print_r($parameters);
-        //easypack24_helper::setLang();
-        $this->config = easypack24_helper::getParameters();
+        //inpostparcels_helper::setLang();
+        $this->config = inpostparcels_helper::getParameters();
     }
 
 	/**
@@ -73,7 +73,7 @@ class VirtuemartControllerEasypack extends VmController {
 
         if (empty($id)) {
             vmError('Id is empty');
-            $mainframe->redirect('index.php?option=com_virtuemart&view=easypack');
+            $mainframe->redirect('index.php?option=com_virtuemart&view=inpostparcels');
         }
 
 		parent::edit($layout);
@@ -92,7 +92,7 @@ class VirtuemartControllerEasypack extends VmController {
 
         foreach ($parcelsIds as $key => $id) {
             $db = JFactory::getDBO();
-            $q = "SELECT * FROM #__virtuemart_shipment_plg_easypack24 WHERE id='".(int)$id."'";
+            $q = "SELECT * FROM #__virtuemart_shipment_plg_inpostparcels WHERE id='".(int)$id."'";
             $db->setQuery($q);
             $result_db = $db->loadObject();
 
@@ -110,7 +110,7 @@ class VirtuemartControllerEasypack extends VmController {
             vmError('Parcel ID is empty');
         }else{
             if(!empty($parcelsToPay)){
-                $parcelApiPay = easypack24_helper::connectEasypack24(array(
+                $parcelApiPay = inpostparcels_helper::connectInpostparcels(array(
                     'url' => $this->config['API_URL'].'parcels/'.implode(';', $parcelsToPay).'/pay',
                     'token' => $this->config['API_KEY'],
                     'methodType' => 'POST',
@@ -128,7 +128,7 @@ class VirtuemartControllerEasypack extends VmController {
                 }
             }
 
-            $parcelApi = easypack24_helper::connectEasypack24(array(
+            $parcelApi = inpostparcels_helper::connectInpostparcels(array(
                 'url' => $this->config['API_URL'].'stickers/'.implode(';', $parcelsCode),
                 'token' => $this->config['API_KEY'],
                 'methodType' => 'GET',
@@ -154,9 +154,8 @@ class VirtuemartControllerEasypack extends VmController {
                 );
                 if(isset($parcelsToPay[$parcelId])){
                     $db = JFactory::getDBO();
-                    $q = "UPDATE #__virtuemart_shipment_plg_easypack24 SET
-                        parcel_status='".$fields['parcel_status']."',
-                        sticker_creation_date ='".$fields['sticker_creation_date']."'
+                    $q = "UPDATE #__virtuemart_shipment_plg_inpostparcels SET
+                        parcel_status='".$fields['parcel_status']."'
                         WHERE id ='".(int)$parcelId."'";
                     $db->setQuery($q);
                     $db->query();
@@ -168,13 +167,13 @@ class VirtuemartControllerEasypack extends VmController {
 
         if ($countNonSticker) {
             if ($countNonSticker) {
-                vmError($countNonSticker.' '.JText::_ ('COM_VIRTUEMART_EASYPACK24_MSG_STICKER_1'));
+                vmError($countNonSticker.' '.JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_STICKER_1'));
             } else {
-                vmError('COM_VIRTUEMART_EASYPACK24_MSG_STICKER_2');
+                vmError('COM_VIRTUEMART_INPOSTPARCELS_MSG_STICKER_2');
             }
         }
         if ($countSticker) {
-            vmInfo($countSticker.' '.JText::_ ('COM_VIRTUEMART_EASYPACK24_MSG_STICKER_3'));
+            vmInfo($countSticker.' '.JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_STICKER_3'));
         }
 
         if(!is_null($pdf)){
@@ -182,7 +181,7 @@ class VirtuemartControllerEasypack extends VmController {
             header('Content-Disposition: attachment; filename=stickers_'.date('Y-m-d_H-i-s').'.pdf');
             print_r($pdf);
         }else{
-            $mainframe->redirect('index.php?option=com_virtuemart&view=easypack');
+            $mainframe->redirect('index.php?option=com_virtuemart&view=inpostparcels');
         }
     }
 
@@ -197,7 +196,7 @@ class VirtuemartControllerEasypack extends VmController {
         $parcelsCode = array();
         foreach ($parcelsIds as $key => $id) {
             $db = JFactory::getDBO();
-            $q = "SELECT * FROM #__virtuemart_shipment_plg_easypack24 WHERE id='".(int)$id."'";
+            $q = "SELECT * FROM #__virtuemart_shipment_plg_inpostparcels WHERE id='".(int)$id."'";
             $db->setQuery($q);
             $result_db = $db->loadObject();
 
@@ -211,7 +210,7 @@ class VirtuemartControllerEasypack extends VmController {
         if(empty($parcelsCode)){
             vmError('Parcel ID is empty');
         }else{
-            $parcelApi = easypack24_helper::connectEasypack24(array(
+            $parcelApi = inpostparcels_helper::connectInpostparcels(array(
                 'url' => $this->config['API_URL'].'parcels/'.implode(';', $parcelsCode),
                 'token' => $this->config['API_KEY'],
                 'methodType' => 'GET',
@@ -236,7 +235,7 @@ class VirtuemartControllerEasypack extends VmController {
                 );
 
                 $db = JFactory::getDBO();
-                $q = "UPDATE #__virtuemart_shipment_plg_easypack24 SET
+                $q = "UPDATE #__virtuemart_shipment_plg_inpostparcels SET
                         parcel_status='".$fields['parcel_status']."'
                         WHERE parcel_id ='".@$parcel->id."'";
                 $db->setQuery($q);
@@ -248,16 +247,16 @@ class VirtuemartControllerEasypack extends VmController {
 
         if ($countNonRefreshStatus) {
             if ($countNonRefreshStatus) {
-                vmError($countNonRefreshStatus.' '.JText::_ ('COM_VIRTUEMART_EASYPACK24_MSG_PARCEL_1'));
+                vmError($countNonRefreshStatus.' '.JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_PARCEL_1'));
             } else {
-                vmError($countNonRefreshStatus.' '.JText::_ ('COM_VIRTUEMART_EASYPACK24_MSG_PARCEL_2'));
+                vmError($countNonRefreshStatus.' '.JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_PARCEL_2'));
             }
         }
         if ($countRefreshStatus) {
-            vmInfo($countRefreshStatus.' '.JText::_ ('COM_VIRTUEMART_EASYPACK24_MSG_PARCEL_3'));
+            vmInfo($countRefreshStatus.' '.JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_PARCEL_3'));
         }
 
-        $mainframe->redirect('index.php?option=com_virtuemart&view=easypack');
+        $mainframe->redirect('index.php?option=com_virtuemart&view=inpostparcels');
     }
 
     public function massCancel(){
@@ -271,7 +270,7 @@ class VirtuemartControllerEasypack extends VmController {
         $parcelsCode = array();
         foreach ($parcelsIds as $key => $id) {
             $db = JFactory::getDBO();
-            $q = "SELECT * FROM #__virtuemart_shipment_plg_easypack24 WHERE id='".(int)$id."'";
+            $q = "SELECT * FROM #__virtuemart_shipment_plg_inpostparcels WHERE id='".(int)$id."'";
             $db->setQuery($q);
             $result_db = $db->loadObject();
 
@@ -286,7 +285,7 @@ class VirtuemartControllerEasypack extends VmController {
             vmError('Parcel ID is empty');
         }else{
             foreach($parcelsCode as $id => $parcelId){
-                $parcelApi = easypack24_helper::connectEasypack24(array(
+                $parcelApi = inpostparcels_helper::connectInpostparcels(array(
                     'url' => $this->config['API_URL'].'parcels',
                     'token' => $this->config['API_KEY'],
                     'methodType' => 'PUT',
@@ -316,7 +315,7 @@ class VirtuemartControllerEasypack extends VmController {
                         );
                         $db = JFactory::getDBO();
 
-                        $q = "UPDATE #__virtuemart_shipment_plg_easypack24 SET
+                        $q = "UPDATE #__virtuemart_shipment_plg_inpostparcels SET
                             parcel_status='".$fields['parcel_status']."'
                             WHERE parcel_id ='".@$parcel->id."'";
                         $db->setQuery($q);
@@ -330,50 +329,81 @@ class VirtuemartControllerEasypack extends VmController {
 
         if ($countNonCancel) {
             if ($countNonCancel) {
-                vmError($countNonCancel.' '.JText::_ ('COM_VIRTUEMART_EASYPACK24_MSG_PARCEL_4'));
+                vmError($countNonCancel.' '.JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_PARCEL_4'));
             } else {
-                vmError('COM_VIRTUEMART_EASYPACK24_MSG_PARCEL_5');
+                vmError('COM_VIRTUEMART_INPOSTPARCELS_MSG_PARCEL_5');
             }
         }
         if ($countCancel) {
-            vmInfo($countNonCancel.' '.JText::_ ('COM_VIRTUEMART_EASYPACK24_MSG_PARCEL_6'));
+            vmInfo($countNonCancel.' '.JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_PARCEL_6'));
         }
 
-        $mainframe->redirect('index.php?option=com_virtuemart&view=easypack');
+        $mainframe->redirect('index.php?option=com_virtuemart&view=inpostparcels');
     }
 
     public function update(){
         $mainframe = Jfactory::getApplication();
         //$model = VmModel::getModel();
         $id = JRequest::getVar('id');
-
         try {
             $postData = JRequest::get();
 
             $db = JFactory::getDBO();
-            $q = "SELECT * FROM #__virtuemart_shipment_plg_easypack24 WHERE id='".(int)$id."'";
+            $q = "SELECT * FROM #__virtuemart_shipment_plg_inpostparcels WHERE id='".(int)$id."'";
             $db->setQuery($q);
-            $result_db = $db->loadObject();
+            $parcel = $db->loadObject();
 
-            $parcelTargetMachineDetailDb = json_decode($result_db->parcel_target_machine_detail);
-            $parcelDetailDb = json_decode($result_db->parcel_detail);
+            $parcelTargetMachineDetailDb = json_decode($parcel->parcel_target_machine_detail);
+            $parcelDetailDb = json_decode($parcel->parcel_detail);
 
-            // update Inpost parcel
-            $params = array(
-                'url' => $this->config['API_URL'].'parcels',
-                'token' => $this->config['API_KEY'],
-                'methodType' => 'PUT',
-                'params' => array(
-                    'description' => !isset($postData['parcel_description']) || $postData['parcel_description'] == @$parcelDetailDb->description?null:$postData['parcel_description'],
-                    'id' => $postData['parcel_id'],
-                    'size' => !isset($postData['parcel_size']) || $postData['parcel_size'] == @$parcelDetailDb->size?null:$postData['parcel_size'],
-                    'status' => !isset($postData['parcel_status']) || $postData['parcel_status'] == $result_db->parcel_status?null:$postData['parcel_status'],
-                    //'target_machine' => !isset($postData['parcel_target_machine_id']) || $postData['parcel_target_machine_id'] == $result_db->parcel_target_machine_id?null:$postData['parcel_target_machine_id']
-                )
-            );
-            $parcelApi = easypack24_helper::connectEasypack24($params);
+            if($parcel->parcel_id != '0'){
+                // update Inpost parcel
+                $params = array(
+                    'url' => $this->config['API_URL'].'parcels',
+                    'token' => $this->config['API_KEY'],
+                    'methodType' => 'PUT',
+                    'params' => array(
+                        'description' => !isset($postData['parcel_description']) || $postData['parcel_description'] == @$parcelDetailDb->description?null:$postData['parcel_description'],
+                        'id' => $postData['parcel_id'],
+                        'size' => !isset($postData['parcel_size']) || $postData['parcel_size'] == @$parcelDetailDb->size?null:$postData['parcel_size'],
+                        'status' => !isset($postData['parcel_status']) || $postData['parcel_status'] == $parcel->parcel_status?null:$postData['parcel_status'],
+                        //'target_machine' => !isset($postData['parcel_target_machine_id']) || $postData['parcel_target_machine_id'] == $parcel->parcel_target_machine_id?null:$postData['parcel_target_machine_id']
+                    )
+                );
+            }else{
+                // create Inpost parcel e.g.
+                $params = array(
+                    'url' => $this->config['API_URL'].'parcels',
+                    'token' => $this->config['API_KEY'],
+                    'methodType' => 'POST',
+                    'params' => array(
+                        'description' => @$postData['parcel_description'],
+                        'description2' => 'virtuemart-2.x',
+                        'receiver' => array(
+                            'phone' => @$postData['parcel_receiver_phone'],
+                            'email' => @$postData['parcel_receiver_email']
+                        ),
+                        'size' => @$postData['parcel_size'],
+                        'tmp_id' => @$postData['parcel_tmp_id'],
+                        'target_machine' => @$postData['parcel_target_machine_id']
+                    )
+                );
 
-            if(@$parcelApi['info']['http_code'] != '204'){
+                switch($parcel->api_source){
+                    case 'PL':
+                        $insurance_amount = $_SESSION['inpostparcels']['parcelInsurancesAmount'];
+                        $params['params']['cod_amount'] = @$postData['parcel_cod_amount'];
+                        if(@$postData['parcel_insurance_amount'] != ''){
+                            $params['params']['insurance_amount'] = @$insurance_amount[@$postData['parcel_insurance_amount']];
+                        }
+                        $params['params']['source_machine'] = @$postData['parcel_source_machine_id'];
+                        break;
+                }
+            }
+
+            $parcelApi = inpostparcels_helper::connectInpostparcels($params);
+
+            if(@$parcelApi['info']['http_code'] != '204' && @$parcelApi['info']['http_code'] != '201'){
                 if(!empty($parcelApi['result'])){
                     foreach(@$parcelApi['result'] as $key => $error){
                         if(is_array($error)){
@@ -385,36 +415,82 @@ class VirtuemartControllerEasypack extends VmController {
                         }
                     }
                 }
-                return;
+                $mainframe->redirect('index.php?option=com_virtuemart&view=inpostparcels&task=edit&id='.$id);
             }else{
-                $fields = array(
-                    'parcel_status' => isset($postData['parcel_status'])?$postData['parcel_status']:$result_db->parcel_status,
-                    'parcel_detail' => json_encode(array(
-                        'description' => $postData['parcel_description'],
-                        'receiver' => array(
-                            'email' => $parcelDetailDb->receiver->email,
-                            'phone' => $parcelDetailDb->receiver->phone
-                        ),
-                        'size' => isset($postData['parcel_size'])?$postData['parcel_size']:@$parcelDetailDb->size,
-                        'tmp_id' => $parcelDetailDb->tmp_id,
-                    ))
-                );
+                if($parcel->parcel_id != '0'){
+                    $parcelDetail = $parcelDetailDb;
+                    $parcelDetail->description = $postData['parcel_description'];
+                    $parcelDetail->size = $postData['parcel_size'];
+                    $parcelDetail->status = $postData['parcel_status'];
 
-                $db = JFactory::getDBO();
+                    $fields = array(
+                        'parcel_status' => isset($postData['parcel_status'])?$postData['parcel_status']:$parcel->parcel_status,
+                        'parcel_detail' => json_encode($parcelDetail),
+                        'variables' => json_encode(array())
+                    );
+                    $db = JFactory::getDBO();
+                    $q = "UPDATE #__virtuemart_shipment_plg_inpostparcels SET
+                        parcel_status='".$fields['parcel_status']."',
+                        parcel_detail='".$fields['parcel_detail']."',
+                        sticker_creation_date='0000-00-00 00:00:00',
+                        variables='".$fields['variables']."'
+                        WHERE id ='".(int)$id."'";
+                    $db->setQuery($q);
+                    $db->query();
+                }else{
+//                    $parcelApi = inpostparcels_helper::connectInpostparcels(
+//                        array(
+//                            'url' => $parcelApi['info']['redirect_url'],
+//                            'token' => $this->config['API_KEY'],
+//                            'ds' => '&',
+//                            'methodType' => 'GET',
+//                            'params' => array(
+//                            )
+//                        )
+//                    );
 
-                $q = "UPDATE #__virtuemart_shipment_plg_easypack24 SET
-                    parcel_status='".$fields['parcel_status']."',
-                    parcel_detail='".$fields['parcel_detail']."'
-                    WHERE id ='".(int)$id."'";
-                $db->setQuery($q);
-                $db->query();
+                    $fields = array(
+                        'parcel_id' => $parcelApi['result']->id,
+                        'parcel_status' => 'Created',
+                        'parcel_detail' => json_encode($params['params']),
+                        'parcel_target_machine_id' => isset($postData['parcel_target_machine_id'])?$postData['parcel_target_machine_id']:$parcel->parcel_target_machine_id,
+                        'parcel_target_machine_detail' => $parcel->parcel_target_machine_detail,
+                        'variables' => json_encode(array())
+                    );
 
+                    if($parcel->parcel_target_machine_id != $postData['parcel_target_machine_id']){
+                        $parcelApi = inpostparcels_helper::connectInpostparcels(
+                            array(
+                                'url' => $this->config['API_URL'].'machines/'.$postData['parcel_target_machine_id'],
+                                'token' => $this->config['API_KEY'],
+                                'methodType' => 'GET',
+                                'params' => array(
+                                )
+                            )
+                        );
+
+                        $fields['parcel_target_machine_detail'] = json_encode($parcelApi['result']);
+                    }
+
+                    $db = JFactory::getDBO();
+                    $q = "UPDATE #__virtuemart_shipment_plg_inpostparcels SET
+                        parcel_id='".$fields['parcel_id']."',
+                        parcel_status='".$fields['parcel_status']."',
+                        parcel_detail='".$fields['parcel_detail']."',
+                        parcel_target_machine_id='".$fields['parcel_target_machine_id']."',
+                        parcel_target_machine_detail='".$fields['parcel_target_machine_detail']."',
+                        sticker_creation_date='0000-00-00 00:00:00',
+                        variables='".$fields['variables']."'
+                        WHERE id ='".(int)$id."'";
+                    $db->setQuery($q);
+                    $db->query();
+                }
             }
-            vmInfo('COM_VIRTUEMART_EASYPACK24_MSG_PARCEL_MODIFIED');
+            vmInfo(JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_MSG_PARCEL_MODIFIED'));
         } catch (Exception $e) {
             vmError($e->getMessage());
         }
-        $mainframe->redirect('index.php?option=com_virtuemart&view=easypack');
+        $mainframe->redirect('index.php?option=com_virtuemart&view=inpostparcels');
     }
 
 

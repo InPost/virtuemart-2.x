@@ -31,8 +31,11 @@ if(VmConfig::get('enableEnglish', 1)){
     $jlang->load('com_virtuemart', JPATH_ADMINISTRATOR, $jlang->getDefault(), true);
     $jlang->load('com_virtuemart', JPATH_ADMINISTRATOR, null, true);
 }
-require_once (JPATH_PLUGINS . DS . 'vmshipment'.DS.'easypack24' . DS . 'easypack24' . DS .'helpers' . DS . 'easypack24_helper.php');
-easypack24_helper::setLang();
+// start inpostparcels
+require_once (JPATH_PLUGINS . DS . 'vmshipment'.DS.'inpostparcels' . DS . 'inpostparcels' . DS .'helpers' . DS . 'inpostparcels_helper.php');
+inpostparcels_helper::setLang();
+// end inpostparcels
+
 
 vmJsApi::jQuery();
 vmJsApi::jSite();

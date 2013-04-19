@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<install version="1.5" type="plugin" group="vmshipment" >
+    <name>VMSHIPMENT_INPOSTPARCELS</name>
+    <creationDate>March 18 2013</creationDate>
+    <author>InPost</author>
+    <authorUrl>http://www.inpost.pl</authorUrl>
+    <copyright>Copyright (C) 2004-2012 Virtuemart Team. All rights reserved.</copyright>
+    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+    <version>2.0.20b</version>
+    <description>InPost Parcel Lockers 24/7</description>
+
+    <files>
+        <filename plugin="">inpostparcels.php</filename>
+        <folder>inpostparcels</folder>
+        <folder>language</folder>
+    </files>
+
+    <languages folder="language">
+        <language tag="en-GB">en-GB/en-GB.com_virtuemart_inpostparcels.ini</language>
+        <language tag="en-GB">en-GB/en-GB.com_virtuemart_inpostparcels.sys.ini</language>
+        <language tag="pl-PL">pl-PL/pl-PL.com_virtuemart_inpostparcels.ini</language>
+        <language tag="pl-PL">pl-PL/pl-PL.com_virtuemart_inpostparcels.sys.ini</language>
+    </languages>
+
+    <params addpath="/plugins/vmshipment/inpostparcels/elements" />
+    <params addpath="/plugins/vmshipment/inpostparcels/inpostparcels/elements" />
+    <params addpath="/administrator/components/com_virtuemart/elements">
+        <param type="vmjpluginwarning" />
+        <param type="spacer" default="" level="level1" />
+         <param	name="shipment_logos" type="vmfiles" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_LOGOS"
+                    description="COM_VIRTUEMART_INPOSTPARCELS_DESCRIPTION"
+                    directory="/images/stories/virtuemart/shipment"
+                    default="default" hide_default="1" hide_none="1"
+                    stripext="0"   exclude="^_" />
+        <param name="API_URL" type="text" size="100" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_API_URL" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_API_URL"/>
+        <param name="API_KEY" type="text" size="100" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_API_KEY" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_API_KEY"/>
+        <param name="PRICE" type="text" size="5" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_PRICE" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_PRICE"/>
+        <param name="tax_id" type="vmtaxes" scope="com_virtuemart"  label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_TAX" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_TAX" />
+        <param name="WEIGHT_UNIT" type="vmweightunit" size="10" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_WEIGHT_UNIT" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_WEIGHT_UNIT"/>
+        <param name="MAX_WEIGHT" type="text" size="5" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_MAX_WEIGHT" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_MAX_WEIGHT"/>
+        <param name="MAX_DIMENSION_A" type="text" size="10" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_MAX_DIMENSION_A" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_MAX_DIMENSION_A"/>
+        <param name="MAX_DIMENSION_B" type="text" size="10" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_MAX_DIMENSION_B" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_MAX_DIMENSION_B"/>
+        <param name="MAX_DIMENSION_C" type="text" size="10" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_MAX_DIMENSION_C" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_MAX_DIMENSION_C"/>
+        <param name="ALLOWED_COUNTRY" type="vmcountries"  scope="com_virtuemart" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_ALLOWED_COUNTRY" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_ALLOWED_COUNTRY"/>
+        <param name="SHOP_CITIES" type="text" size="10" default="" label="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_SHOP_CITIES" description="COM_VIRTUEMART_INPOSTPARCELS_CONFIG_INFO_SHOP_CITIES"/>
+
+    </params>
+</install>

@@ -14,13 +14,13 @@ defined ('_JEXEC') or die('Restricted access');
  * is derivative of works licensed under the GNU General Public License or
  * other free or open source software licenses.
  */
-class easypack24_helper {
+class inpostparcels_helper {
 
     public static function test(){
         return 'test';        
     }
 
-    public static function connectEasypack24($params = array()){
+    public static function connectInpostparcels($params = array()){
 
         $params = array_merge(
             array(
@@ -129,7 +129,7 @@ class easypack24_helper {
         $parcelSize = 'A';
         $is_dimension = true;
 
-        if(!empty($max_dimensions)){
+        if(!empty($product_dimensions)){
             $maxDimensionFromConfigSizeA = explode('x', strtolower(trim($config['MAX_DIMENSION_A'])));
             $maxWidthFromConfigSizeA = (float)trim(@$maxDimensionFromConfigSizeA[0]);
             $maxHeightFromConfigSizeA = (float)trim(@$maxDimensionFromConfigSizeA[1]);
@@ -188,33 +188,67 @@ class easypack24_helper {
             }
         }
 
+        $parcelSizeRemap = array(
+            'UK' => array(
+                'A' => 'S',
+                'B' => 'M',
+                'C' => 'L'
+            ),
+            'PL' => array(
+                'A' => 'M',
+                'B' => 'S',
+                'C' => 'D'
+            )
+        );
+
         return array(
+            //'parcelSize' => $parcelSizeRemap[self::getCurrentApi()][$parcelSize],
             'parcelSize' => $parcelSize,
             'isDimension' => $is_dimension
         );
     }
 
+    public static function getCurrentApi(){
+        $currentApi = 'UK';
+        $config = self::getParameters();
+        $db = JFactory::getDBO();
+        $q = 'SELECT `country_2_code` FROM `#__virtuemart_countries` WHERE `virtuemart_country_id`="'.$config['ALLOWED_COUNTRY'].'"';
+        $db->setQuery($q);
+        $country = $db->loadResult();
+
+        if($config['ALLOWED_COUNTRY'] && !is_array($config['ALLOWED_COUNTRY'])){
+            $currentApi = $country;
+            if($currentApi == 'GB'){
+                $currentApi = 'UK';
+            }
+        }
+
+        return $currentApi;
+    }
+
     public static function getParameters(){
         $db = JFactory::getDBO();
-        $q = 'SELECT `shipment_params` FROM `#__virtuemart_shipmentmethods` WHERE `shipment_element`="easypack24"';
+        $q = 'SELECT `shipment_params` FROM `#__virtuemart_shipmentmethods` WHERE `shipment_element`="inpostparcels"';
         $db->setQuery($q);
         $shipment_params = explode("|", stripcslashes($db->loadResult()));
         foreach($shipment_params as $value){
             $ex = explode("=", $value);
             $config[$ex[0]] = str_replace('"', '', $ex[1]);
         }
+        $config['ALLOWED_COUNTRY'] = str_replace('[', '', $config['ALLOWED_COUNTRY']);
+        $config['ALLOWED_COUNTRY'] = str_replace(']', '', $config['ALLOWED_COUNTRY']);
         return $config;
     }
 
     public static function setLang(){
         $jlang = JFactory::getLanguage();
-        $jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', 'en-GB', true);
-        $jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', $jlang->getDefault(), true);
-        $jlang->load('com_virtuemart_easypack24', JPATH_PLUGINS.'/vmshipment/easypack24', null, true);
+        $jlang->load('com_virtuemart_inpostparcels', JPATH_PLUGINS.'/vmshipment/inpostparcels', 'en-GB', true);
+        $jlang->load('com_virtuemart_inpostparcels', JPATH_PLUGINS.'/vmshipment/inpostparcels', $jlang->getDefault(), true);
+        $jlang->load('com_virtuemart_inpostparcels', JPATH_PLUGINS.'/vmshipment/inpostparcels', null, true);
 
-//        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, 'en-GB', true);
-//        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, $jlang->getDefault(), true);
-//        $jlang->load('com_virtuemart_easypack24', JPATH_ADMINISTRATOR, null, true);
+//        $jlang->load('com_virtuemart_inpostparcels', JPATH_ADMINISTRATOR, 'en-GB', true);
+//        $jlang->load('com_virtuemart_inpostparcels', JPATH_ADMINISTRATOR, $jlang->getDefault(), true);
+//        $jlang->load('com_virtuemart_inpostparcels', JPATH_ADMINISTRATOR, null, true);
 
 
     }

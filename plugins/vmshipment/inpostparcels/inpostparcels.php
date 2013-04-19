@@ -7,15 +7,15 @@ if (!class_exists ('vmPSPlugin')) {
 }
 
 if (JVM_VERSION === 2) {
-    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'easypack24' . DS . 'easypack24' . DS . 'helpers' . DS . 'define.php');
+    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'inpostparcels' . DS . 'inpostparcels' . DS . 'helpers' . DS . 'define.php');
 } else {
-    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'easypack24' . DS . 'helpers' . DS . 'define.php');
+    require (JPATH_ROOT . DS . 'plugins' . DS . 'vmshipment' . DS . 'inpostparcels' . DS . 'helpers' . DS . 'define.php');
 }
 
-require_once (JPATH_VMEASYPACK24PLUGIN . DS . 'easypack24' . DS . 'helpers' . DS . 'easypack24_helper.php');
+require_once (JPATH_VMINPOSTPARCELSPLUGIN . DS . 'inpostparcels' . DS . 'helpers' . DS . 'inpostparcels_helper.php');
 require(JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'parameterparser.php');
 
-class plgVmShipmentEasypack24 extends vmPSPlugin {
+class plgVmShipmentInpostparcels extends vmPSPlugin {
 
 	// instance of class
 	public static $_this = FALSE;
@@ -36,8 +36,8 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
 		$varsToPush = $this->getVarsToPush ();
 		$this->setConfigParameterable ($this->_configTableFieldName, $varsToPush);
 
-        easypack24_helper::setLang();
-        //$parameters = new vmParameters('TableShipmentmethods', 'easypack24', 'plugin', 'vmshipment');
+        inpostparcels_helper::setLang();
+        //$parameters = new vmParameters('TableShipmentmethods', 'inpostparcels', 'plugin', 'vmshipment');
         //print_r($parameters);
 
         //vmWarn('AA_GG');
@@ -72,6 +72,8 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
             'parcel_target_machine_id'     => 'varchar(200)',
             'parcel_target_machine_detail' => 'text',
             'sticker_creation_date'        => 'timestamp',
+            'api_source'                   => 'varchar(3)',
+            'variables'                    => 'text',
 
 			'order_number'                 => 'char(32)',
 			'virtuemart_shipmentmethod_id' => 'mediumint(1) UNSIGNED',
@@ -121,87 +123,44 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
 		}
 
         $order_id = $order['details']['BT']->virtuemart_order_id;
-        $parcel_id = null;
-        $parcel_status = 'Created';
         $parcel_detail = array(
-            //'cod_amount' => Mage::getStoreConfig('carriers/easypack24/cod_amount'),
-            'description' => JText::_ ('COM_VIRTUEMART_EASYPACK24_ORDER').$order_id,
-            //'insurance_amount' => Mage::getStoreConfig('carriers/easypack24/insurance_amount'),
+            'description' => JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_ORDER').$order_id,
             'receiver' => array(
-                'email' => $_SESSION['easypack24']['user_email'],
-                'phone' => $_SESSION['easypack24']['shipping_easypack24']['receiver_phone'],
+                'email' => $_SESSION['inpostparcels']['user_email'],
+                'phone' => $_SESSION['inpostparcels']['shipping_inpostparcels']['receiver_phone'],
             ),
-            'size' => $_SESSION['easypack24']['parcel_size'],
-            //'source_machine' => $data['parcel_source_machine'],
-            'tmp_id' => easypack24_helper::generate(4, 15),
-        );
-        $parcel_target_machine_id = $_SESSION['easypack24']['shipping_easypack24']['parcel_target_machine_id'];
-        $parcel_target_machine_detail = @$_SESSION['easypack24']['parcelTargetAllMachinesDetail'][$parcel_target_machine_id];
-
-        // create Inpost parcel
-        $params = array(
-            'url' => $method->API_URL.'parcels',
-            'token' => $method->API_KEY,
-            'methodType' => 'POST',
-            'params' => array(
-                //'cod_amount' => '',
-                'description' => @$parcel_detail['description'],
-                //'insurance_amount' => '',
-                'receiver' => array(
-                    'phone' => str_replace('mob:', '', @$parcel_detail['receiver']['phone']),
-                    'email' => @$parcel_detail['receiver']['email']
-                ),
-                'size' => @$parcel_detail['size'],
-                //'source_machine' => '',
-                'tmp_id' => @$parcel_detail['tmp_id'],
-                'target_machine' => $parcel_target_machine_id
-            )
+            'size' => $_SESSION['inpostparcels']['parcel_size'],
+            'tmp_id' => inpostparcels_helper::generate(4, 15),
+            'target_machine' => $_SESSION['inpostparcels']['shipping_inpostparcels']['parcel_target_machine_id']
         );
 
-        $parcelApi = easypack24_helper::connectEasypack24($params);
-
-        if(@$parcelApi['info']['redirect_url'] != ''){
-
-            // get machines
-            $parcelApi = easypack24_helper::connectEasypack24(
-                array(
-                    'url' => $parcelApi['info']['redirect_url'],
-                    'token' => $method->API_KEY,
-                    'ds' => '&',
-                    'methodType' => 'GET',
-                    'params' => array(
-                    )
-                )
-            );
-            if(!isset($parcelApi['result']->id)){
-                return false;
-            }
-
-            $parcel_id = $parcelApi['result']->id;
-
-            $values['virtuemart_order_id'] = $order_id;
-            $values['parcel_id'] = $parcel_id;
-            $values['parcel_status'] = $parcel_status;
-            $values['parcel_detail'] = json_encode($parcel_detail);
-            $values['parcel_target_machine_id'] = $parcel_target_machine_id;
-            $values['parcel_target_machine_detail'] = json_encode($parcel_target_machine_detail);
-
-            $values['order_number'] = $order['details']['BT']->order_number;
-            $values['virtuemart_shipmentmethod_id'] = $order['details']['BT']->virtuemart_shipmentmethod_id;
-            $values['shipment_name'] = $this->renderPluginName ($method);
-            $values['order_weight'] = $this->getOrderWeight ($cart, $method->weight_unit);
-            $values['shipment_weight_unit'] = $method->weight_unit;
-            $values['shipment_cost'] = $method->cost;
-            $values['shipment_package_fee'] = $method->package_fee;
-            $values['tax_id'] = $method->tax_id;
-            $this->storePSPluginInternalData ($values);
-
-            unset($_SESSION['easypack24']);
-            return TRUE;
-
-        }else{
-            return false;
+        switch (inpostparcels_helper::getCurrentApi()){
+            case 'PL':
+                $parcel_detail['cod_amount'] = ($order['details']['BT']->virtuemart_paymentmethod_id == 1)? sprintf("%.2f" ,$order['details']['BT']->order_total) : '';
+                break;
         }
+
+        $parcel_target_machine_id = $_SESSION['inpostparcels']['shipping_inpostparcels']['parcel_target_machine_id'];
+        $parcel_target_machine_detail = @$_SESSION['inpostparcels']['parcelTargetAllMachinesDetail'][$parcel_target_machine_id];
+
+        $values['virtuemart_order_id'] = $order_id;
+        $values['parcel_detail'] = json_encode($parcel_detail);
+        $values['parcel_target_machine_id'] = $parcel_target_machine_id;
+        $values['parcel_target_machine_detail'] = json_encode($parcel_target_machine_detail);
+        $values['api_source'] = inpostparcels_helper::getCurrentApi();
+
+        $values['order_number'] = $order['details']['BT']->order_number;
+        $values['virtuemart_shipmentmethod_id'] = $order['details']['BT']->virtuemart_shipmentmethod_id;
+        $values['shipment_name'] = $this->renderPluginName ($method);
+        $values['order_weight'] = $this->getOrderWeight ($cart, $method->weight_unit);
+        $values['shipment_weight_unit'] = $method->weight_unit;
+        $values['shipment_cost'] = $method->cost;
+        $values['shipment_package_fee'] = $method->package_fee;
+        $values['tax_id'] = $method->tax_id;
+        $this->storePSPluginInternalData ($values);
+
+        unset($_SESSION['inpostparcels']);
+        return TRUE;
 	}
 
 	/**
@@ -249,17 +208,17 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
 		$taxDisplay = is_array ($tax) ? $tax['calc_value'] . ' ' . $tax['calc_value_mathop'] : $shipinfo->tax_id;
 		$taxDisplay = ($taxDisplay == -1) ? JText::_ ('COM_VIRTUEMART_PRODUCT_TAX_NONE') : $taxDisplay;
 
-        //easypack24_helper::setLang();
+        //inpostparcels_helper::setLang();
 
 		$html = '<table class="adminlist">' . "\n";
 		$html .= $this->getHtmlHeaderBE ();
-		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_EASYPACK24_SHIPPING_NAME', $shipinfo->shipment_name);
-        $html .= $this->getHtmlRowBE ('COM_VIRTUEMART_EASYPACK24_MACHINE', $shipinfo->parcel_target_machine_id);
-        $html .= $this->getHtmlRowBE ('COM_VIRTUEMART_EASYPACK24_MOBILE', $parcelDetail->receiver->phone);
-        $html .= $this->getHtmlRowBE ('COM_VIRTUEMART_EASYPACK24_WEIGHT', $shipinfo->order_weight . ' ' . ShopFunctions::renderWeightUnit ($shipinfo->shipment_weight_unit));
-		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_EASYPACK24_COST', $currency->priceDisplay ($shipinfo->shipment_cost));
-		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_EASYPACK24_PACKAGE_FEE', $currency->priceDisplay ($shipinfo->shipment_package_fee));
-		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_EASYPACK24_TAX', $taxDisplay);
+		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_INPOSTPARCELS_SHIPPING_NAME', $shipinfo->shipment_name);
+        $html .= $this->getHtmlRowBE ('COM_VIRTUEMART_INPOSTPARCELS_MACHINE', $shipinfo->parcel_target_machine_id);
+        $html .= $this->getHtmlRowBE ('COM_VIRTUEMART_INPOSTPARCELS_MOBILE', $parcelDetail->receiver->phone);
+        $html .= $this->getHtmlRowBE ('COM_VIRTUEMART_INPOSTPARCELS_WEIGHT', $shipinfo->order_weight . ' ' . ShopFunctions::renderWeightUnit ($shipinfo->shipment_weight_unit));
+		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_INPOSTPARCELS_COST', $currency->priceDisplay ($shipinfo->shipment_cost));
+		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_INPOSTPARCELS_PACKAGE_FEE', $currency->priceDisplay ($shipinfo->shipment_package_fee));
+		$html .= $this->getHtmlRowBE ('COM_VIRTUEMART_INPOSTPARCELS_TAX', $taxDisplay);
 		$html .= '</table>' . "\n";
 
 		return $html;
@@ -341,7 +300,7 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
             $costDisplay = '<span class="' . $this->_type . '_cost"> (' . JText::_ ('COM_VIRTUEMART_PLUGIN_COST_DISPLAY') . $costDisplay . ")</span>";
         }
 
-        $content = $this->renderByLayout ('edit_shippment', $this->prepareData($cart, $this->methods[0], $this->_psType . '_id_' . $plugin->$pluginmethod_id), 'easypack24', 'shipment');
+        $content = $this->renderByLayout ('edit_shippment', $this->prepareData($cart, $this->methods[0], $this->_psType . '_id_' . $plugin->$pluginmethod_id), 'inpostparcels', 'shipment');
 
         $html = '<input type="radio" name="' . $pluginmethod_id . '" id="' . $this->_psType . '_id_' . $plugin->$pluginmethod_id . '"   value="' . $plugin->$pluginmethod_id . '" ' . $checked . ">\n"
             . '<label for="' . $this->_psType . '_id_' . $plugin->$pluginmethod_id . '">' . '<span class="' . $this->_type . '">' . $plugin->$pluginName . "</span></label>
@@ -353,18 +312,18 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
 
     protected function prepareData(VirtueMartCart $cart, $method, $radio_id) {
         $address = (($cart->ST == 0) ? $cart->BT : $cart->ST);
-        $easypack24 = array();
-        $easypack24['radio_id'] = $radio_id;
-        $easypack24['address'] = $address;
-        $easypack24['user_email'] = $address['email'];
-        $easypack24['user_phone'] = $address['phone_2'];
-        if(!preg_match('/^[1-9]{1}\d{8}$/', $easypack24['user_phone'])){
-            $easypack24['user_phone'] = null;
+
+        $inpostparcels = array();
+        $inpostparcels['radio_id'] = $radio_id;
+        $inpostparcels['address'] = $address;
+        $inpostparcels['user_email'] = $cart->BT['email'];
+        $inpostparcels['user_phone'] = $address['phone_2'];
+        if(!preg_match('/^[1-9]{1}\d{8}$/', $inpostparcels['user_phone'])){
+            $inpostparcels['user_phone'] = null;
         }
 
-
         // get machines
-        $allMachines = easypack24_helper::connectEasypack24(
+        $allMachines = inpostparcels_helper::connectInpostparcels(
             array(
                 'url' => $method->API_URL.'machines',
                 'token' => $method->API_KEY,
@@ -398,14 +357,14 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
                     $machines[$key] = $machine;
                 }
 
-                $easypack24['parcelTargetAllMachinesId'] = $parcelTargetAllMachinesId;
-                $easypack24['parcelTargetAllMachinesDetail'] = $parcelTargetAllMachinesDetail;
+                $inpostparcels['parcelTargetAllMachinesId'] = $parcelTargetAllMachinesId;
+                $inpostparcels['parcelTargetAllMachinesDetail'] = $parcelTargetAllMachinesDetail;
             }
         }
 
         $parcelTargetMachinesId = array();
         $parcelTargetMachinesDetail = array();
-        $easypack24['defaultSelect'] = 'Select Machine..';
+        $inpostparcels['defaultSelect'] = 'Select Machine..';
         if(is_array(@$machines) && !empty($machines)){
             foreach($machines as $key => $machine){
                 $parcelTargetMachinesId[$machine->id] = $machine->id.', '.@$machine->address->city.', '.@$machine->address->street;
@@ -421,13 +380,13 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
                     )
                 );
             }
-            $easypack24['parcelTargetMachinesId'] = $parcelTargetMachinesId;
+            $inpostparcels['parcelTargetMachinesId'] = $parcelTargetMachinesId;
         }else{
-            $easypack24['defaultSelect'] = JText::_ ('COM_VIRTUEMART_EASYPACK24_DEFAULT_SELECT');
+            $inpostparcels['defaultSelect'] = JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_DEFAULT_SELECT');
         }
 
-        $_SESSION['easypack24'] = $easypack24;
-        return array('easypack24' => $easypack24);
+        $_SESSION['inpostparcels'] = $inpostparcels;
+        return array('inpostparcels' => $inpostparcels);
     }
 
 
@@ -455,14 +414,19 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
             $product_dimensions[] = (float)$product->product_width.'x'.(float)$product->product_height.'x'.(float)$product->product_length;
         }
 
-        $calculateDimension = easypack24_helper::calculateDimensions($product_dimensions, array(
-            $method->MAX_DIMENSION_A, $method->MAX_DIMENSION_B, $method->MAX_DIMENSION_C
-        ));
+        $calculateDimension = inpostparcels_helper::calculateDimensions($product_dimensions,
+            array(
+                'MAX_DIMENSION_A' => $method->MAX_DIMENSION_A,
+                'MAX_DIMENSION_B' => $method->MAX_DIMENSION_B,
+                'MAX_DIMENSION_C' => $method->MAX_DIMENSION_C
+            )
+        );
 
         if(!$calculateDimension['isDimension']){
             return false;
         }
-        $_SESSION['easypack24']['parcel_size'] = $calculateDimension['parcelSize'];
+
+        $_SESSION['inpostparcels']['parcel_size'] = $calculateDimension['parcelSize'];
 
         return true;
     }
@@ -492,10 +456,10 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
 	 */
 	function plgVmOnStoreInstallShipmentPluginTable ($jplugin_id) {
         $db = JFactory::getDBO ();
-        $db->setQuery ("SELECT count(id) as count FROM #__virtuemart_adminmenuentries WHERE name='COM_VIRTUEMART_EASYPACK24_LINK'");
+        $db->setQuery ("SELECT count(id) as count FROM #__virtuemart_adminmenuentries WHERE name='COM_VIRTUEMART_INPOSTPARCELS_LINK'");
 
         if($db->loadResult() <= 0){
-            $query = "INSERT INTO #__virtuemart_adminmenuentries (id, module_id, parent_id, name, link, depends, icon_class, ordering, published, tooltip, view, task) VALUES (null, 2, 0, 'COM_VIRTUEMART_EASYPACK24_LINK', '', '', 'vmicon vmicon-16-page_white_stack', 1, 1, '', 'easypack', '')";
+            $query = "INSERT INTO #__virtuemart_adminmenuentries (id, module_id, parent_id, name, link, depends, icon_class, ordering, published, tooltip, view, task) VALUES (null, 2, 0, 'COM_VIRTUEMART_INPOSTPARCELS_LINK', '', '', 'vmicon vmicon-16-page_white_stack', 1, 1, '', 'inpostparcels', '')";
             $db->setQuery ($query);
             $db->query();
         }
@@ -513,23 +477,28 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
             return NULL; // Another method was selected, do nothing
         }
 
-        if(@$_POST['shipping_easypack24']['parcel_target_machine_id'] == ''){
-            vmError('', 'COM_VIRTUEMART_EASYPACK24_VALID_SELECT');
+        if(@$_POST['shipping_inpostparcels']['parcel_target_machine_id'] == ''){
+            vmError('', 'COM_VIRTUEMART_INPOSTPARCELS_VALID_SELECT');
             return false;
         }
 
-        if(!preg_match('/^[1-9]{1}\d{8}$/', @$_POST['shipping_easypack24']['receiver_phone'])){
-            vmError('', 'COM_VIRTUEMART_EASYPACK24_VALID_MOBILE');
+        if(!preg_match('/^[1-9]{1}\d{8}$/', @$_POST['shipping_inpostparcels']['receiver_phone'])){
+            vmError('', 'COM_VIRTUEMART_INPOSTPARCELS_VALID_MOBILE');
             return false;
         }
 
-        $_SESSION['easypack24']['shipping_easypack24'] = $_POST['shipping_easypack24'];
+        if(@$_SESSION['inpostparcels']['user_email'] == ''){
+            vmError('', 'COM_VIRTUEMART_INPOSTPARCELS_VALID_EMAIL');
+            return false;
+        }
+
+        $_SESSION['inpostparcels']['shipping_inpostparcels'] = $_POST['shipping_inpostparcels'];
 
         if($cart->ST == 0){
             $cart->ST = $cart->BT;
         }
 
-        $shipping = $_SESSION['easypack24']['parcelTargetAllMachinesDetail'][$_POST['shipping_easypack24']['parcel_target_machine_id']];
+        $shipping = $_SESSION['inpostparcels']['parcelTargetAllMachinesDetail'][$_POST['shipping_inpostparcels']['parcel_target_machine_id']];
 
         $cart->ST['address_1'] = $shipping['address']['street'].' '.$shipping['address']['building_number'];
         if(@$shipping['address']['flat_number'] != ''){
@@ -537,7 +506,7 @@ class plgVmShipmentEasypack24 extends vmPSPlugin {
         }
         $cart->ST['city'] = $shipping['address']['city'];
         $cart->ST['zip'] = $shipping['address']['post_code'];
-        //$cart->ST['state'] = $_SESSION['easypack24']['parcelTargetMachineDetail']['address']['province'];
+        //$cart->ST['state'] = $_SESSION['inpostparcels']['parcelTargetMachineDetail']['address']['province'];
 
         return $this->OnSelectCheck ($cart);
 	}

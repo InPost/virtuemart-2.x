@@ -5,7 +5,7 @@ defined('_JEXEC') or die('Restricted access');
 
 if(!class_exists('VmModel'))require(JPATH_VM_ADMINISTRATOR.DS.'helpers'.DS.'vmmodel.php');
 
-class VirtueMartModelEasypack extends VmModel {
+class VirtueMartModelInpostparcels extends VmModel {
 
 	/**
 	 * constructs a VmModel
@@ -14,7 +14,7 @@ class VirtueMartModelEasypack extends VmModel {
 	 */
 	function __construct() {
 		parent::__construct();
-		$this->setMainTable('easypack24');
+		$this->setMainTable('inpostparcels');
         //$this->addvalidOrderingFieldName(array('parcel_id' ) );
     }
 
@@ -46,7 +46,7 @@ class VirtueMartModelEasypack extends VmModel {
             $whereString = '';
         }
 
-        if ( JRequest::getCmd('view') == 'easypack') {
+        if ( JRequest::getCmd('view') == 'inpostparcels') {
             $ordering = $this->_getOrdering();
         } else {
             $ordering = ' order by created_by DESC';
@@ -59,7 +59,7 @@ class VirtueMartModelEasypack extends VmModel {
 
     private function getParcelsListQuery()
     {
-        return ' FROM #__virtuemart_shipment_plg_easypack24';
+        return ' FROM #__virtuemart_shipment_plg_inpostparcels';
     }
 
 
