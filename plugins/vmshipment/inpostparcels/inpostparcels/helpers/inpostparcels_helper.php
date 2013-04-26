@@ -243,13 +243,31 @@ class inpostparcels_helper {
     public static function setLang(){
         $jlang = JFactory::getLanguage();
         $jlang->load('com_virtuemart_inpostparcels', JPATH_PLUGINS.'/vmshipment/inpostparcels', 'en-GB', true);
-        $jlang->load('com_virtuemart_inpostparcels', JPATH_PLUGINS.'/vmshipment/inpostparcels', $jlang->getDefault(), true);
+        $jlang->load('com_virtuemart_inpostparcels', JPATH_PLUGINS.'/vmshipment/inpostparcels', $jlang->getTag(), true);
         $jlang->load('com_virtuemart_inpostparcels', JPATH_PLUGINS.'/vmshipment/inpostparcels', null, true);
 
 //        $jlang->load('com_virtuemart_inpostparcels', JPATH_ADMINISTRATOR, 'en-GB', true);
 //        $jlang->load('com_virtuemart_inpostparcels', JPATH_ADMINISTRATOR, $jlang->getDefault(), true);
 //        $jlang->load('com_virtuemart_inpostparcels', JPATH_ADMINISTRATOR, null, true);
 
+
+    }
+
+    public static function getVersion(){
+        return '1.0.0';
+    }
+
+    public static function getGeowidgetUrl(){
+
+        switch(self::getCurrentApi()){
+            case 'UK':
+                return 'https://geowidget.inpost.co.uk/dropdown.php?field_to_update=name&field_to_update2=address&user_function=user_function';
+                break;
+
+            case 'PL':
+                return 'https://geowidget.inpost.pl/dropdown.php?field_to_update=name&field_to_update2=address&user_function=user_function';
+                break;
+        }
 
     }
 }

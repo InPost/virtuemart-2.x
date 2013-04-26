@@ -160,6 +160,7 @@ class plgVmShipmentInpostparcels extends vmPSPlugin {
         $this->storePSPluginInternalData ($values);
 
         unset($_SESSION['inpostparcels']);
+        unset($cart->ST);
         return TRUE;
 	}
 
@@ -323,13 +324,21 @@ class plgVmShipmentInpostparcels extends vmPSPlugin {
         }
 
         // get machines
+        $machine_params = array();
+        switch(inpostparcels_helper::getCurrentApi()){
+            case 'PL':
+                $machine_params['payment_available'] = true;
+                break;
+            case 'UK':
+                break;
+        }
+
         $allMachines = inpostparcels_helper::connectInpostparcels(
             array(
                 'url' => $method->API_URL.'machines',
                 'token' => $method->API_KEY,
                 'methodType' => 'GET',
-                'params' => array(
-                )
+                'params' => $machine_params
             )
         );
 
@@ -364,7 +373,7 @@ class plgVmShipmentInpostparcels extends vmPSPlugin {
 
         $parcelTargetMachinesId = array();
         $parcelTargetMachinesDetail = array();
-        $inpostparcels['defaultSelect'] = 'Select Machine..';
+        $inpostparcels['defaultSelect'] = JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_SELECT_MACHINE');
         if(is_array(@$machines) && !empty($machines)){
             foreach($machines as $key => $machine){
                 $parcelTargetMachinesId[$machine->id] = $machine->id.', '.@$machine->address->city.', '.@$machine->address->street;
@@ -397,7 +406,6 @@ class plgVmShipmentInpostparcels extends vmPSPlugin {
      * @return bool
      */
     protected function checkConditions ($cart, $method, $cart_prices) {
-
         // check countries
         $address = (($cart->ST == 0) ? $cart->BT : $cart->ST);
         if(!in_array($address['virtuemart_country_id'], $method->ALLOWED_COUNTRY)){

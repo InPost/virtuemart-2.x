@@ -126,6 +126,12 @@ class VirtuemartViewInpostparcels extends VmView {
                 $machines = array();
                 if(is_array(@$allMachines['result']) && !empty($allMachines['result'])){
                     foreach($allMachines['result'] as $key => $machine){
+                        if(in_array($parcel->api_source, array('PL'))){
+                            if($machine->payment_available == false){
+                                continue;
+                            }
+                        }
+
                         $parcelTargetAllMachinesId[$machine->id] = $machine->id.', '.@$machine->address->city.', '.@$machine->address->street;
                         $parcelTargetAllMachinesDetail[$machine->id] = array(
                             'id' => $machine->id,
@@ -182,9 +188,9 @@ class VirtuemartViewInpostparcels extends VmView {
 
                         if(isset($api['result']) && !empty($api['result'])){
                             $parcelInsurancesAmount = array(
-                                'insurance_price1' => $api['result']->insurance_price1,
-                                'insurance_price2' => $api['result']->insurance_price2,
-                                'insurance_price3' => $api['result']->insurance_price3
+                                ''.$api['result']->insurance_price1.'' => $api['result']->insurance_price1,
+                                ''.$api['result']->insurance_price2.'' => $api['result']->insurance_price2,
+                                ''.$api['result']->insurance_price3.'' => $api['result']->insurance_price3
                             );
                         }
 
@@ -228,7 +234,12 @@ class VirtuemartViewInpostparcels extends VmView {
                             }
                         }else{
                             $defaultTargetMachine = JText::_('COM_VIRTUEMART_INPOSTPARCELS_VIEW_DEFAULT_SELECT');
+                            if(@$parcelDetailDb->source_machine != ''){
+                                $parcelSourceMachinesId[$parcelDetailDb->source_machine] = @$parcelSourceAllMachinesId[$parcelDetailDb->source_machine];
+                                $parcelSourceMachinesDetail[$parcelDetailDb->source_machine] = @$parcelSourceMachinesDetail[$parcelDetailDb->source_machine];
+                            }
                         }
+
 
                         $this->assignRef('parcelSourceMachinesId', $parcelSourceMachinesId);
                         $this->assignRef('parcelSourceMachinesDetail', $parcelSourceMachinesDetail);

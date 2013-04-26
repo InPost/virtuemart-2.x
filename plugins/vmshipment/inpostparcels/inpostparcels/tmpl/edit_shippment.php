@@ -7,7 +7,7 @@
 
 
 ?>
-<script type="text/javascript" src="https://geowidget.inpost.co.uk/dropdown.php?field_to_update=name&field_to_update2=address&user_function=user_function"></script>
+<script type="text/javascript" src="<?php echo inpostparcels_helper::getGeowidgetUrl(); ?>"></script>
 <table id="inpostparcels_detail" width="350">
     <tr>
         <td>

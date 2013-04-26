@@ -11,10 +11,18 @@ AdminUIHelper::startAdminArea();
 
 ?>
 
-<script type="text/javascript" src="https://geowidget.inpost.co.uk/dropdown.php?field_to_update=name&field_to_update2=address&user_function=user_function"></script>
+<script type="text/javascript" src="<?php echo inpostparcels_helper::getGeowidgetUrl(); ?>"></script>
 <script type="text/javascript">
     function user_function(value) {
+
         var address = value.split(';');
+        var openIndex = address[4];
+        var sufix = '';
+
+        if(openIndex == 'source_machine') {
+            sufix = '_source';
+        }
+
         //document.getElementById('town').value=address[1];
         //document.getElementById('street').value=address[2]+address[3];
         var box_machine_name = document.getElementById('name').value;
@@ -23,40 +31,11 @@ AdminUIHelper::startAdminArea();
 
 
         var is_value = 0;
-        document.getElementById('shipping_inpostparcels').value = box_machine_name;
-        var shipping_inpostparcels = document.getElementById('shipping_inpostparcels');
+        document.getElementById('shipping_inpostparcels'+sufix).value = box_machine_name;
+        var shipping_inpostparcels = document.getElementById('shipping_inpostparcels'+sufix);
 
         for(i=0;i<shipping_inpostparcels.length;i++){
             if(shipping_inpostparcels.options[i].value == document.getElementById('name').value){
-                shipping_inpostparcels.selectedIndex = i;
-                is_value = 1;
-            }
-        }
-
-        if (is_value == 0){
-            shipping_inpostparcels.options[shipping_inpostparcels.options.length] = new Option(box_machine_name+','+box_machine_town+','+box_machine_street, box_machine_name);
-            shipping_inpostparcels.selectedIndex = shipping_inpostparcels.length-1;
-        }
-    }
-</script>
-
-<script type="text/javascript" src="https://geowidget.inpost.co.uk/dropdown.php?field_to_update=name_source&field_to_update2=address_source&user_function=user_function_source"></script>
-<script type="text/javascript">
-    function user_function_source(value) {
-        var address = value.split(';');
-        //document.getElementById('town').value=address[1];
-        //document.getElementById('street').value=address[2]+address[3];
-        var box_machine_name = document.getElementById('name_source').value;
-        var box_machine_town = document.value=address[1];
-        var box_machine_street = document.value=address[2];
-
-
-        var is_value = 0;
-        document.getElementById('shipping_inpostparcels_source').value = box_machine_name;
-        var shipping_inpostparcels = document.getElementById('shipping_inpostparcels_source');
-
-        for(i=0;i<shipping_inpostparcels.length;i++){
-            if(shipping_inpostparcels.options[i].value == document.getElementById('name_source').value){
                 shipping_inpostparcels.selectedIndex = i;
                 is_value = 1;
             }
@@ -151,7 +130,7 @@ AdminUIHelper::startAdminArea();
             <input type="hidden" id="name_source" name="name_source" disabled="disabled" />
             <input type="hidden" id="box_machine_town_source" name="box_machine_town_source" disabled="disabled" />
             <input type="hidden" id="address_source" name="address_source" disabled="disabled" />
-            <a href="#" onclick="openMap(); return false;"><?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_MAP') ?></a>
+            <a href="#" onclick="openMap('source_machine'); return false;"><?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_MAP') ?></a>
             &nbsp|&nbsp<input type="checkbox" name="show_all_machines_source" <?php echo $this->disabledSourceMachine; ?>> <?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_SHOW_TERMINAL') ?>
         </td>
     </tr>
@@ -174,7 +153,7 @@ AdminUIHelper::startAdminArea();
             <input type="hidden" id="name" name="name" disabled="disabled" />
             <input type="hidden" id="box_machine_town" name="box_machine_town" disabled="disabled" />
             <input type="hidden" id="address" name="address" disabled="disabled" />
-            <a href="#" onclick="openMap(); return false;"><?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_MAP') ?></a>
+            <a href="#" onclick="openMap('target_machine'); return false;"><?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_MAP') ?></a>
             &nbsp|&nbsp<input type="checkbox" name="show_all_machines" <?php echo $this->disabledTargetMachine; ?>> <?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_SHOW_TERMINAL') ?>
         </td>
     </tr>
@@ -225,16 +204,16 @@ AdminUIHelper::endAdminArea(); ?>
                 //alert('all machines');
                 var machines = {
                     '' : '<?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_SELECT_MACHINE..');?>',
-                <?php foreach($this->parcelTargetAllMachinesId as $key => $parcelTargetAllMachineId): ?>
-                    '<?php echo $key ?>' : '<?php echo addslashes($parcelTargetAllMachineId) ?>',
+                <?php foreach($this->parcelSourceAllMachinesId as $key => $parcelSourceAllMachineId): ?>
+                    '<?php echo $key ?>' : '<?php echo addslashes($parcelSourceAllMachineId) ?>',
                     <?php endforeach; ?>
                 };
             }else{
                 //alert('criteria machines');
                 var machines = {
                     '' : '<?php echo JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_VIEW_SELECT_MACHINE..');?>',
-                <?php foreach($this->parcelTargetMachinesId as $key => $parcelTargetMachineId): ?>
-                    '<?php echo $key ?>' : '<?php echo addslashes($parcelTargetMachineId) ?>',
+                <?php foreach($this->parcelSourceMachinesId as $key => $parcelSourceMachineId): ?>
+                    '<?php echo $key ?>' : '<?php echo addslashes($parcelSourceMachineId) ?>',
                     <?php endforeach; ?>
                 };
             }
