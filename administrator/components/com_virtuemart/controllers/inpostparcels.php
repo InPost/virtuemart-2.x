@@ -37,6 +37,8 @@ if (!class_exists ('vmPlugin')) {
 require_once (JPATH_VMINPOSTPARCELSPLUGIN . DS . 'inpostparcels' . DS . 'helpers' . DS . 'inpostparcels_helper.php');
 require(JPATH_VM_ADMINISTRATOR . DS . 'helpers' . DS . 'parameterparser.php');
 
+
+
 /**
  * Orders Controller
  *
@@ -177,8 +179,12 @@ class VirtuemartControllerInpostparcels extends VmController {
         }
 
         if(!is_null($pdf)){
-            header('Content-type', 'application/pdf');
-            header('Content-Disposition: attachment; filename=stickers_'.date('Y-m-d_H-i-s').'.pdf');
+            $fileName = 'stickers_'.date('Y-m-d_H-i-s').'.pdf';
+            $d = JFactory::getDocument();
+            $d->setMimeEncoding('application/pdf');
+            JResponse::setHeader('Content-Type', 'application/pdf', true);
+            JResponse::setHeader('Content-disposition', 'inline; filename="'.$fileName.'"', true);
+            JResponse::sendHeaders();
             print_r($pdf);
         }else{
             $mainframe->redirect('index.php?option=com_virtuemart&view=inpostparcels');
