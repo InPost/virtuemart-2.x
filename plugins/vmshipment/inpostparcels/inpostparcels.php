@@ -393,6 +393,8 @@ class plgVmShipmentInpostparcels extends vmPSPlugin {
         }else{
             $inpostparcels['defaultSelect'] = JText::_ ('COM_VIRTUEMART_INPOSTPARCELS_DEFAULT_SELECT');
         }
+        $inpostparcels['parcelTargetMachinesId'] = $parcelTargetMachinesId;
+
 
         $_SESSION['inpostparcels'] = $inpostparcels;
         return array('inpostparcels' => $inpostparcels);
